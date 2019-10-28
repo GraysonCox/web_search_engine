@@ -4,10 +4,6 @@ import java.util.*;
 
 import api.TaggedVertex;
 import api.Util;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
-import javax.swing.text.html.HTML;
 
 /**
  * Implementation of an inverted index for a web graph.
@@ -16,6 +12,7 @@ import javax.swing.text.html.HTML;
  */
 public class Index {
 
+	private WebService webService;
 	private List<TaggedVertex<String>> urls;
 	private List<String> words;
 	private Map<String, Map<String, Integer>> listW;
@@ -29,6 +26,7 @@ public class Index {
 	 */
 	public Index(List<TaggedVertex<String>> urls) {
 		this.urls = urls;
+		webService = WebService.getInstance();
 		words = new ArrayList<>();
 		listW = new HashMap<>();
 	}
@@ -40,7 +38,7 @@ public class Index {
 		String bodyText, word;
 		Scanner scanner;
 		for (TaggedVertex<String> currentPage : urls) { // Iterate through pages.
-			bodyText = getTextFromPage(currentPage.getVertexData());
+			bodyText = webService.getBodyFromPage(currentPage.getVertexData());
 			scanner = new Scanner(bodyText);
 			while (scanner.hasNext()) { // Iterate through words in page.
 				word = scanner.next();
@@ -132,15 +130,5 @@ public class Index {
 	public List<TaggedVertex<String>> searchAndNot(String w1, String w2) {
 		// TODO
 		return null;
-	}
-
-	private String getTextFromPage(String url) {
-		String bodyText = "";
-		try {
-			bodyText = Jsoup.connect(url).get().body().text();
-		} catch (Exception e) {
-			e.printStackTrace(); // TODO: Better error handling
-		}
-		return bodyText;
 	}
 }
