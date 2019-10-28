@@ -1,6 +1,8 @@
 package test;
 
 import api.TaggedVertex;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import pa1.AdjacencyListGraph;
 
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ class AdjacencyListGraphTest {
 
 	AdjacencyListGraph<String> graph = new AdjacencyListGraph();
 
-	@org.junit.jupiter.api.BeforeEach
+	@BeforeEach
 	void setUp() {
 		for (int i = 0; i < testVertices.length; i++) {
 			graph.addVertex(testVertices[i]);
@@ -40,24 +42,24 @@ class AdjacencyListGraphTest {
 		}
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	void addVertex() {
 		String s = "New Vertex";
 		graph.addVertex(s);
 		assert graph.vertexData().get(graph.vertexData().size() - 1) == s;
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	void addEdge() {
 		// TODO
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	void vertexData() {
 		assertArrayEquals(testVertices, graph.vertexData().toArray());
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	void vertexDataWithIncomingCounts() {
 		int[] expectedIncomingCounts = new int[testVertices.length];
 		List<TaggedVertex<String>> actualVertexDataWithIncomingCounts = graph.vertexDataWithIncomingCounts();
@@ -74,7 +76,7 @@ class AdjacencyListGraphTest {
 		}
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	void getNeighbors() {
 		int v = testVertex;
 		List<Integer> expectedNeighbors = new ArrayList<>();
@@ -87,7 +89,7 @@ class AdjacencyListGraphTest {
 		assert actualNeighbors.equals(expectedNeighbors);
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	void getIncoming() {
 		int v = testVertex;
 		List<Integer> expectedIncoming = new LinkedList<>();
