@@ -14,7 +14,7 @@ class CrawlerTest {
 
     final String testUrl = "https://www.spacejam.com/archive/spacejam/movie/jam.html";
     final int maxDepth = 15;
-    final int maxPages = 150;
+    final int maxPages = 25;
 
     Crawler crawler;
 

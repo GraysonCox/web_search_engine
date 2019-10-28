@@ -1,8 +1,13 @@
 package pa1;
 
-import java.util.List;
+import java.util.*;
 
 import api.TaggedVertex;
+import api.Util;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import javax.swing.text.html.HTML;
 
 /**
  * Implementation of an inverted index for a web graph.
@@ -10,6 +15,10 @@ import api.TaggedVertex;
  * @author Grayson Cox
  */
 public class Index {
+
+	private List<TaggedVertex<String>> urls;
+	private List<String> words;
+	private Map<String, Map<String, Integer>> listW;
 
 	/**
 	 * Constructs an index from the given list of urls.  The
@@ -19,14 +28,36 @@ public class Index {
 	 * @param urls information about graph to be indexed
 	 */
 	public Index(List<TaggedVertex<String>> urls) {
-
+		this.urls = urls;
+		words = new ArrayList<>();
+		listW = new HashMap<>();
 	}
 
 	/**
 	 * Creates the index.
 	 */
 	public void makeIndex() {
-		// TODO
+		String bodyText, word;
+		Scanner scanner;
+		for (TaggedVertex<String> currentPage : urls) { // Iterate through pages.
+			bodyText = getTextFromPage(currentPage.getVertexData());
+			scanner = new Scanner(bodyText);
+			while (scanner.hasNext()) { // Iterate through words in page.
+				word = scanner.next();
+				word = Util.stripPunctuation(word);
+				if (Util.isStopWord(word) || word.isEmpty()) {
+					continue;
+				}
+				if (listW.containsKey(word)) { // The word has been found at least once already
+					int oldCount = listW.get(word).getOrDefault(currentPage.getVertexData(), 0);
+					listW.get(word).put(currentPage.getVertexData(), oldCount + 1);
+				} else { // The word has not been found previously
+					words.add(word);
+					listW.put(word, new HashMap<>());
+					listW.get(word).put(currentPage.getVertexData(), 1);
+				}
+			}
+		}
 	}
 
 	/**
@@ -101,5 +132,15 @@ public class Index {
 	public List<TaggedVertex<String>> searchAndNot(String w1, String w2) {
 		// TODO
 		return null;
+	}
+
+	private String getTextFromPage(String url) {
+		String bodyText = "";
+		try {
+			bodyText = Jsoup.connect(url).get().body().text();
+		} catch (Exception e) {
+			e.printStackTrace(); // TODO: Better error handling
+		}
+		return bodyText;
 	}
 }
