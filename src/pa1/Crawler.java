@@ -1,6 +1,17 @@
 package pa1;
 
 import api.Graph;
+import api.TaggedVertex;
+import api.Util;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * Implementation of a basic web crawler that creates a graph of some
@@ -9,6 +20,10 @@ import api.Graph;
  * @author Grayson Cox
  */
 public class Crawler {
+
+	private final String seedUrl;
+	private final int maxDepth;
+	private final int maxPages;
 
 	/**
 	 * Constructs a Crawler that will start with the given seed url, including
@@ -19,7 +34,9 @@ public class Crawler {
 	 * @param maxPages
 	 */
 	public Crawler(String seedUrl, int maxDepth, int maxPages) {
-		// TODO
+		this.seedUrl = seedUrl;
+		this.maxDepth = maxDepth;
+		this.maxPages = maxPages;
 	}
 
 	/**
@@ -29,8 +46,54 @@ public class Crawler {
 	 *
 	 * @return an instance of Graph representing this portion of the web
 	 */
-	public Graph<String> crawl() {
-		// TODO
-		return null;
+	public Graph<String> crawl() { // TODO: Make this more efficient.
+		AdjacencyListGraph<String> graph = new AdjacencyListGraph<>();
+		Queue<TaggedVertex<String>> queue = new LinkedList<>();
+		List<String> discovered = new ArrayList<>();
+
+		graph.addVertex(seedUrl);
+		queue.add(new TaggedVertex<>(seedUrl, 0));
+		discovered.add(seedUrl);
+
+		TaggedVertex<String> currentPage;
+		List<String> links;
+		int linkIndex, depth = 0;
+		while (!queue.isEmpty() && depth <= maxDepth) {
+			currentPage = queue.remove();
+			links = getLinksFromPage(currentPage.getVertexData());
+			for (String link : links) {
+				if (Util.ignoreLink(currentPage.getVertexData(), link)) {
+					continue;
+				}
+				if (!discovered.contains(link)) {
+					discovered.add(link);
+					linkIndex = graph.addVertexReturnIndex(link);
+					graph.addEdge(currentPage.getTagValue(), linkIndex);
+					queue.add(new TaggedVertex<>(link, linkIndex));
+				} else {
+					linkIndex = graph.indexOf(link);
+					if (!graph.getNeighbors(currentPage.getTagValue()).contains(linkIndex)) { // TODO: Refactor
+						graph.addEdge(currentPage.getTagValue(), linkIndex);
+					}
+				}
+				if (graph.vertexData().size() == maxPages) {
+					return graph;
+				}
+			}
+			depth++;
+		}
+		return graph;
+	}
+
+	private List<String> getLinksFromPage(String url) {
+		Document doc;
+		Elements links = null;
+		try {
+			doc = Jsoup.connect(url).get();
+			links = doc.select("a[href]");
+		} catch (Exception e) {
+			e.printStackTrace(); // TODO: Better error handling
+		}
+		return links.eachAttr("abs:href");
 	}
 }

@@ -2,7 +2,6 @@ package pa1;
 
 import api.Graph;
 import api.TaggedVertex;
-import sun.security.provider.certpath.AdjacencyList;
 
 import java.util.*;
 
@@ -21,11 +20,21 @@ public class AdjacencyListGraph<E> implements Graph<E> {
 		adjacencyLists.add(new LinkedList<>());
 	}
 
+	public int addVertexReturnIndex(E v) {
+		vertices.add(v);
+		adjacencyLists.add(new LinkedList<>());
+		return vertices.size() - 1;
+	}
+
 	public void addEdge(int u, int v) {
 		if (u >= vertices.size() || v >= vertices.size()) {
 			return; // TODO: Better error handling
 		}
 		adjacencyLists.get(u).add(v);
+	}
+
+	public int indexOf(E v) {
+		return vertices.indexOf(v);
 	}
 
 	// MARK - Graph<E>
