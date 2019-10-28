@@ -13,9 +13,9 @@ import api.Util;
 public class Index {
 
 	private WebService webService;
-	private List<TaggedVertex<String>> urls;
-	private List<String> words;
+	private Map<String, Integer> inDegreesForUrl;
 	private Map<String, Map<String, Integer>> listW;
+	private Comparator<TaggedVertex> rankComparator = (o1, o2) -> o2.getTagValue() - o1.getTagValue();
 
 	/**
 	 * Constructs an index from the given list of urls.  The
@@ -25,10 +25,12 @@ public class Index {
 	 * @param urls information about graph to be indexed
 	 */
 	public Index(List<TaggedVertex<String>> urls) {
-		this.urls = urls;
 		webService = WebService.getInstance();
-		words = new ArrayList<>();
+		inDegreesForUrl = new HashMap<>();
 		listW = new HashMap<>();
+		for (TaggedVertex<String> v : urls) {
+			inDegreesForUrl.put(v.getVertexData(), v.getTagValue());
+		}
 	}
 
 	/**
@@ -37,8 +39,8 @@ public class Index {
 	public void makeIndex() {
 		String bodyText, word;
 		Scanner scanner;
-		for (TaggedVertex<String> currentPage : urls) { // Iterate through pages.
-			bodyText = webService.getBodyFromPage(currentPage.getVertexData());
+		for (String currentPage : inDegreesForUrl.keySet()) { // Iterate through pages.
+			bodyText = webService.getBodyFromPage(currentPage);
 			scanner = new Scanner(bodyText);
 			while (scanner.hasNext()) { // Iterate through words in page.
 				word = scanner.next();
@@ -47,12 +49,11 @@ public class Index {
 					continue;
 				}
 				if (listW.containsKey(word)) { // The word has been found at least once already
-					int oldCount = listW.get(word).getOrDefault(currentPage.getVertexData(), 0);
-					listW.get(word).put(currentPage.getVertexData(), oldCount + 1);
+					int oldCount = listW.get(word).getOrDefault(currentPage, 0);
+					listW.get(word).put(currentPage, oldCount + 1);
 				} else { // The word has not been found previously
-					words.add(word);
 					listW.put(word, new HashMap<>());
-					listW.get(word).put(currentPage.getVertexData(), 1);
+					listW.get(word).put(currentPage, 1);
 				}
 			}
 		}
@@ -70,8 +71,21 @@ public class Index {
 	 * @return ranked list of urls
 	 */
 	public List<TaggedVertex<String>> search(String w) {
-		// TODO
-		return null;
+		w = Util.stripPunctuation(w);
+		Map<String, Integer> pagesContainingW = listW.get(w);
+		if (pagesContainingW == null) {
+			return new ArrayList<>();
+		}
+		SortedSet<TaggedVertex<String>> rankedList = new TreeSet<TaggedVertex<String>>(rankComparator);
+		int rank;
+		for (Map.Entry<String, Integer> urlTuple : pagesContainingW.entrySet()) {
+			if (urlTuple.getValue() == 0) { // TODO: Is this necessary?
+				continue;
+			}
+			rank = inDegreesForUrl.get(urlTuple.getKey()) * urlTuple.getValue();
+			rankedList.add(new TaggedVertex<String>(urlTuple.getKey(), rank));
+		}
+		return new ArrayList<>(rankedList); // TODO: Make sure this is efficient.
 	}
 
 
@@ -90,8 +104,24 @@ public class Index {
 	 * @return ranked list of urls
 	 */
 	public List<TaggedVertex<String>> searchWithAnd(String w1, String w2) {
-		// TODO
-		return null;
+		w1 = Util.stripPunctuation(w1);
+		w2 = Util.stripPunctuation(w2);
+		Map<String, Integer> pagesContainingW1 = listW.get(w1),
+				pagesContainingW2 = listW.get(w2);
+		if (pagesContainingW1 == null || pagesContainingW2 == null) {
+			return new ArrayList<>();
+		}
+		SortedSet<TaggedVertex<String>> rankedList = new TreeSet<>(rankComparator);
+		int rank, w2Count;
+		for (Map.Entry<String, Integer> urlTuple : pagesContainingW1.entrySet()) {
+			w2Count = pagesContainingW2.getOrDefault(urlTuple.getKey(), 0);
+			if (w2Count == 0) {
+				continue;
+			}
+			rank = inDegreesForUrl.get(urlTuple.getKey()) * (urlTuple.getValue() + w2Count);
+			rankedList.add(new TaggedVertex<String>(urlTuple.getKey(), rank));
+		}
+		return new ArrayList<>(rankedList);
 	}
 
 	/**

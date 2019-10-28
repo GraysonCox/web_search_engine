@@ -1,104 +1,67 @@
 package test;
 
 import api.TaggedVertex;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pa1.Index;
 
+import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Properties;
 
 class IndexTest {
 
+	final String PROPERTIES_FILE = "VertexDataWithIncomingCounts.properties";
+
 	Index index;
-
-	String testUrls[] = {
-			"https://www.spacejam.com/archive/spacejam/movie/jam.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/pressbox/pressboxframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/jamcentral/jamcentralframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/bball/bballframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/tunes/tunesframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/lineup/lineupframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/jump/jumpframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/junior/juniorframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/studiostoreframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/souvenirs/souvenirsframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/sitemap.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/behind/behindframes.html",
-			"https://policies.warnerbros.com/privacy/",
-			"http://policies.warnerbros.com/terms/en-us/",
-			"http://policies.warnerbros.com/terms/en-us/#accessibility",
-			"https://policies.warnerbros.com/privacy/en-us/#adchoices",
-			"https://www.spacejam.com/archive/spacejam/movie/index.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/jamcentral/filmmakersframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/jamcentral/prodnotesframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/jamcentral/photosframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/jamcentral/trailerframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/behind/chardevelopmentframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/behind/sketchesframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/behind/brollframes.html",
-			"https://www.spacejam.com/archive/spacejam/movie/cmp/behind/techframes.html"
-	};
-
-	int testInDegrees[] = {
-			1,
-			1,
-			2,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			2,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1
-	};
-
+	String testQuery1 = "Donald",
+			testQuery2 = "Duck";
 
 	@BeforeEach
 	void setUp() {
 		List<TaggedVertex<String>> list = new ArrayList<>();
-		for (int i = 0; i < testUrls.length; i++) {
-			list.add(new TaggedVertex<>(testUrls[i], testInDegrees[i]));
+		try {
+			FileReader fileReader = new FileReader(PROPERTIES_FILE);
+			Properties properties = new Properties();
+			properties.load(fileReader);
+
+			Enumeration urls = properties.propertyNames();
+			String key;
+			while (urls.hasMoreElements()) {
+				key = (String) urls.nextElement();
+				list.add(new TaggedVertex<String>(key, Integer.parseInt(properties.getProperty(key))));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		index = new Index(list);
 		index.makeIndex();
 	}
 
 	@Test
-	void makeIndex() {
-	}
-
-	@Test
 	void search() {
-
+		List<TaggedVertex<String>> rankedList = index.search(testQuery1);
+		TestUtils.printTaggedVertexList(rankedList);
 	}
 
 	@Test
 	void searchWithAnd() {
+		List<TaggedVertex<String>> rankedList = index.searchWithAnd(testQuery1, testQuery2);
+		TestUtils.printTaggedVertexList(rankedList);
 	}
 
 	@Test
 	void searchWithOr() {
+		List<TaggedVertex<String>> rankedList = index.searchWithOr(testQuery1, testQuery2);
+		TestUtils.printTaggedVertexList(rankedList);
 	}
 
 	@Test
 	void searchAndNot() {
+		List<TaggedVertex<String>> rankedList = index.searchAndNot(testQuery1, testQuery2);
+		TestUtils.printTaggedVertexList(rankedList);
 	}
 }
