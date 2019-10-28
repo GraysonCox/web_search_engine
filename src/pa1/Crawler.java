@@ -3,10 +3,6 @@ package pa1;
 import api.Graph;
 import api.TaggedVertex;
 import api.Util;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -24,6 +20,7 @@ public class Crawler {
 	private final String seedUrl;
 	private final int maxDepth;
 	private final int maxPages;
+	private WebService webService;
 
 	/**
 	 * Constructs a Crawler that will start with the given seed url, including
@@ -37,6 +34,7 @@ public class Crawler {
 		this.seedUrl = seedUrl;
 		this.maxDepth = maxDepth;
 		this.maxPages = maxPages;
+		this.webService = WebService.getInstance();
 	}
 
 	/**
@@ -60,7 +58,7 @@ public class Crawler {
 		int linkIndex, depth = 0;
 		while (!queue.isEmpty() && depth <= maxDepth) {
 			currentPage = queue.remove();
-			links = getLinksFromPage(currentPage.getVertexData());
+			links = webService.getLinksFromPage(currentPage.getVertexData());
 			for (String link : links) {
 				if (Util.ignoreLink(currentPage.getVertexData(), link)) {
 					continue;
@@ -83,17 +81,5 @@ public class Crawler {
 			depth++;
 		}
 		return graph;
-	}
-
-	private List<String> getLinksFromPage(String url) {
-		Document doc;
-		Elements links = null;
-		try {
-			doc = Jsoup.connect(url).get();
-			links = doc.select("a[href]");
-		} catch (Exception e) {
-			e.printStackTrace(); // TODO: Better error handling
-		}
-		return links.eachAttr("abs:href");
 	}
 }
