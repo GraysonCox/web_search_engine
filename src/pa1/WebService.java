@@ -67,9 +67,10 @@ public class WebService {
 	private Document downloadPage(String url) {
 		Document doc = null;
 		try {
+			System.out.println("Connecting to " + url + " ...");
 			doc = Jsoup.connect(url).get();
 		} catch (Exception e) {
-//			e.printStackTrace(); // TODO: Better error handling
+			System.err.println("Couldn't connect to " + url); // TODO: Better error handling
 			return null;
 		}
 		coolDownIfNeeded();
@@ -83,9 +84,10 @@ public class WebService {
 		requestCount = (requestCount + 1) % REQUEST_LIMIT;
 		if (requestCount == 0) { // Cool down after reaching REQUEST_LIMIT
 			try {
+				System.out.println("Cool down for " + COOL_DOWN_TIME/1000 + " seconds ...");
 				Thread.sleep(COOL_DOWN_TIME);
 			} catch (InterruptedException ignore) {
-
+				System.err.println("Cool down interrupted");
 			}
 		}
 	}
