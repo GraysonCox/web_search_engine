@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WebService {
@@ -35,7 +36,7 @@ public class WebService {
 	public List<String> getLinksFromPage(String url) {
 		Document doc = downloadPage(url);
 		if (doc == null) {
-			return null;
+			return new ArrayList<>();
 		}
 		Elements links = doc.select("a[href]");
 		return links.eachAttr("abs:href");
@@ -46,11 +47,12 @@ public class WebService {
 	 * contained in the page's body.
 	 * @param url
 	 * @return A String containing all the text from the page's body
+	 * or an empty string if the page has no body
 	 */
 	public String getBodyFromPage(String url) {
 		Document doc = downloadPage(url);
 		if (doc == null || doc.body() == null) {
-			return null;
+			return "";
 		}
 		return doc.body().text();
 	}
@@ -74,6 +76,9 @@ public class WebService {
 		return doc;
 	}
 
+	/**
+	 * Increments requestCount and triggers a cooldown if REQUEST_LIMIT has been reached
+	 */
 	private void coolDownIfNeeded() {
 		requestCount = (requestCount + 1) % REQUEST_LIMIT;
 		if (requestCount == 0) { // Cool down after reaching REQUEST_LIMIT
