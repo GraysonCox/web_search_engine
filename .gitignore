@@ -2,3 +2,6 @@ lib/
 out/
 .idea/
 *.class
+.DS_Store
+src/.DS_Store
+web_search_engine.iml
