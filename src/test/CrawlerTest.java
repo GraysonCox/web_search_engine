@@ -8,13 +8,16 @@ import pa1.Crawler;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class CrawlerTest {
 
-    final String testUrl = "https://www.spacejam.com/archive/spacejam/movie/jam.html";
-    final int maxDepth = 15;
-    final int maxPages = 25;
+    final String PROPERTIES_FILE = "VertexDataWithIncomingCounts.properties";
+
+//    final String testUrl = "https://www.spacejam.com/archive/spacejam/movie/jam.html/";
+//    final String testUrl = "https://www.reddit.com/";
+//    final String testUrl = "https://en.wikipedia.org/wiki/Internet_meme";
+    final String testUrl = "https://en.wikipedia.org/wiki/Hank_Hill";
+    final int maxDepth = 100;
+    final int maxPages = 100;
 
     Crawler crawler;
 
@@ -27,8 +30,6 @@ class CrawlerTest {
     void Crawl() {
         Graph graph = crawler.crawl();
         List<TaggedVertex<String>> urls = graph.vertexDataWithIncomingCounts();
-        for (TaggedVertex v : urls) {
-            System.out.println(v.getVertexData() + ", " + v.getTagValue());
-        }
+        TestUtils.writeToPropertiesFile(urls, PROPERTIES_FILE);
     }
 }

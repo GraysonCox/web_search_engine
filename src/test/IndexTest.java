@@ -17,26 +17,12 @@ class IndexTest {
 	final String PROPERTIES_FILE = "VertexDataWithIncomingCounts.properties";
 
 	Index index;
-	String testQuery1 = "Donald",
-			testQuery2 = "Duck";
+	String testQuery1 = "Propane",
+			testQuery2 = "Charcoal";
 
 	@BeforeEach
 	void setUp() {
-		List<TaggedVertex<String>> list = new ArrayList<>();
-		try {
-			FileReader fileReader = new FileReader(PROPERTIES_FILE);
-			Properties properties = new Properties();
-			properties.load(fileReader);
-
-			Enumeration urls = properties.propertyNames();
-			String key;
-			while (urls.hasMoreElements()) {
-				key = (String) urls.nextElement();
-				list.add(new TaggedVertex<String>(key, Integer.parseInt(properties.getProperty(key))));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		List<TaggedVertex<String>> list = TestUtils.readFromPropertiesFile(PROPERTIES_FILE);
 		index = new Index(list);
 		index.makeIndex();
 	}

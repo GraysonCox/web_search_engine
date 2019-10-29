@@ -76,14 +76,14 @@ public class Index {
 		if (pagesContainingW == null) {
 			return new ArrayList<>();
 		}
-		SortedSet<TaggedVertex<String>> rankedList = new TreeSet<TaggedVertex<String>>(rankComparator);
+		SortedSet<TaggedVertex<String>> rankedList = new TreeSet<>(rankComparator);
 		int rank;
 		for (Map.Entry<String, Integer> urlTuple : pagesContainingW.entrySet()) {
 			if (urlTuple.getValue() == 0) { // TODO: Is this necessary?
 				continue;
 			}
 			rank = inDegreesForUrl.get(urlTuple.getKey()) * urlTuple.getValue();
-			rankedList.add(new TaggedVertex<String>(urlTuple.getKey(), rank));
+			rankedList.add(new TaggedVertex<>(urlTuple.getKey(), rank));
 		}
 		return new ArrayList<>(rankedList); // TODO: Make sure this is efficient.
 	}
@@ -119,7 +119,7 @@ public class Index {
 				continue;
 			}
 			rank = inDegreesForUrl.get(urlTuple.getKey()) * (urlTuple.getValue() + w2Count);
-			rankedList.add(new TaggedVertex<String>(urlTuple.getKey(), rank));
+			rankedList.add(new TaggedVertex<>(urlTuple.getKey(), rank));
 		}
 		return new ArrayList<>(rankedList);
 	}
