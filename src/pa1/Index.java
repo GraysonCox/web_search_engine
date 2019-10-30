@@ -158,7 +158,22 @@ public class Index {
 	 * @return ranked list of urls
 	 */
 	public List<TaggedVertex<String>> searchAndNot(String w1, String w2) {
-		// TODO
-		return null;
+		w1 = Util.stripPunctuation(w1);
+		w2 = Util.stripPunctuation(w2);
+		Map<String, Integer> pagesContainingW1 = listW.get(w1),
+			pagesContainingW2 = listW.get(w2);
+		if (pagesContainingW1 == null) {
+			return new ArrayList<>();
+		}
+		SortedSet<TaggedVertex<String>> rankedList = new TreeSet<>(rankComparator);
+		int rank;
+		for (Map.Entry<String, Integer> urlTuple : pagesContainingW1.entrySet()) {
+			if (pagesContainingW2.containsKey(urlTuple.getKey())) {
+				continue;
+			}
+			rank = inDegreesForUrl.get(urlTuple.getKey()) * urlTuple.getValue();
+			rankedList.add(new TaggedVertex<>(urlTuple.getKey(), rank));
+		}
+		return new ArrayList<>(rankedList); // TODO: Make sure this is efficient.
 	}
 }
