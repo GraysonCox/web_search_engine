@@ -10,7 +10,7 @@ import java.util.List;
 
 class CrawlerTest {
 
-	final String PROPERTIES_FILE = "VertexDataWithIncomingCounts.properties";
+	final String PROPERTIES_FILE = "src/test/test_data/VertexDataWithIncomingCounts.properties";
 
 	final String testUrl = "https://www.spacejam.com/archive/spacejam/movie/jam.html";
 	final int maxDepth = 15;

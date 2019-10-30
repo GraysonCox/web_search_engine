@@ -9,7 +9,7 @@ import java.util.List;
 
 class IndexTest {
 
-	final String TEST_DATA_FILE = "VertexDataWithIncomingCounts.properties";
+	final String TEST_DATA_FILE = "src/test/test_data/VertexDataWithIncomingCounts.properties";
 
 	String testQuery1 = "Propane",
 			testQuery2 = "Charcoal";
