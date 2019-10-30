@@ -34,6 +34,14 @@ public class Index {
 	}
 
 	/**
+	 * This prevents my unit tests from re-building the index unnecessarily.
+	 * @return true if the Index's data structures have already been made.
+	 */
+	public boolean isMade() {
+		return !listW.isEmpty();
+	}
+
+	/**
 	 * Creates the index.
 	 */
 	public void makeIndex() {
@@ -83,6 +91,9 @@ public class Index {
 				continue;
 			}
 			rank = inDegreesForUrl.get(urlTuple.getKey()) * urlTuple.getValue();
+			if (rank == 0) {
+				continue;
+			}
 			rankedList.add(new TaggedVertex<>(urlTuple.getKey(), rank));
 		}
 		return new ArrayList<>(rankedList); // TODO: Make sure this is efficient.
@@ -119,6 +130,9 @@ public class Index {
 				continue;
 			}
 			rank = inDegreesForUrl.get(urlTuple.getKey()) * (urlTuple.getValue() + w2Count);
+			if (rank == 0) {
+				continue;
+			}
 			rankedList.add(new TaggedVertex<>(urlTuple.getKey(), rank));
 		}
 		return new ArrayList<>(rankedList);
@@ -139,8 +153,25 @@ public class Index {
 	 * @return ranked list of urls
 	 */
 	public List<TaggedVertex<String>> searchWithOr(String w1, String w2) {
-		// TODO
-		return null;
+		w1 = Util.stripPunctuation(w1);
+		w2 = Util.stripPunctuation(w2);
+		Map<String, Integer> pagesContainingW1 = listW.get(w1),
+				pagesContainingW2 = listW.get(w2);
+		int w1Count, w2Count, rank;
+		SortedSet<TaggedVertex<String>> rankedList = new TreeSet<>(rankComparator);
+		for (Map.Entry<String, Integer> urlInDegreeTuple : inDegreesForUrl.entrySet()) {
+			w1Count = pagesContainingW1.getOrDefault(urlInDegreeTuple.getKey(), 0);
+			w2Count = pagesContainingW2.getOrDefault(urlInDegreeTuple.getKey(), 0);
+			if (w1Count == 0 && w2Count == 0) {
+				continue;
+			}
+			rank = urlInDegreeTuple.getValue() * (w1Count + w2Count);
+			if (rank == 0) {
+				continue;
+			}
+			rankedList.add(new TaggedVertex<>(urlInDegreeTuple.getKey(), rank));
+		}
+		return new ArrayList<>(rankedList); // TODO: Make sure this is efficient.
 	}
 
 	/**
@@ -172,6 +203,9 @@ public class Index {
 				continue;
 			}
 			rank = inDegreesForUrl.get(urlTuple.getKey()) * urlTuple.getValue();
+			if (rank == 0) {
+				continue;
+			}
 			rankedList.add(new TaggedVertex<>(urlTuple.getKey(), rank));
 		}
 		return new ArrayList<>(rankedList); // TODO: Make sure this is efficient.

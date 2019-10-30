@@ -1,28 +1,24 @@
 package test;
 
 import api.TaggedVertex;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pa1.Index;
 
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Properties;
 
 class IndexTest {
 
-	final String PROPERTIES_FILE = "VertexDataWithIncomingCounts.properties";
+	final String TEST_DATA_FILE = "VertexDataWithIncomingCounts.properties";
 
-	Index index;
 	String testQuery1 = "Propane",
 			testQuery2 = "Charcoal";
 
+	Index index;
+
 	@BeforeEach
 	void setUp() {
-		List<TaggedVertex<String>> list = TestUtils.readFromPropertiesFile(PROPERTIES_FILE);
+		List<TaggedVertex<String>> list = TestUtils.readFromPropertiesFile(TEST_DATA_FILE);
 		index = new Index(list);
 		index.makeIndex();
 	}
