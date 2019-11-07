@@ -12,9 +12,9 @@ class CrawlerTest {
 
 	final String PROPERTIES_FILE = "src/test/test_data/VertexDataWithIncomingCounts.properties";
 
-	final String testUrl = "https://www.spacejam.com/archive/spacejam/movie/jam.html";
+	final String testUrl = "https://en.wikipedia.org/wiki/Kevin_Bacon";
 	final int maxDepth = 15;
-	final int maxPages = 150;
+	final int maxPages = 500;
 
 	Crawler crawler;
 
