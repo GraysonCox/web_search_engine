@@ -78,7 +78,7 @@ public class Crawler {
 					return graph;
 				}
 			}
-			depth++;
+			depth++; // TODO: I don't think this is right.
 		}
 		return graph;
 	}
