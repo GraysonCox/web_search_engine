@@ -37,6 +37,10 @@ public class AdjacencyListGraph<E> implements Graph<E> {
 		return vertices.indexOf(v);
 	}
 
+	public int size() {
+		return vertices.size();
+	}
+
 	// MARK - Graph<E>
 
 	@Override

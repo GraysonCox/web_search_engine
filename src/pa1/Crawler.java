@@ -4,10 +4,7 @@ import api.Graph;
 import api.TaggedVertex;
 import api.Util;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Implementation of a basic web crawler that creates a graph of some
@@ -44,42 +41,43 @@ public class Crawler {
 	 *
 	 * @return an instance of Graph representing this portion of the web
 	 */
-	public Graph<String> crawl() { // TODO: Make this more efficient.
-		AdjacencyListGraph<String> graph = new AdjacencyListGraph<>();
-		Queue<TaggedVertex<String>> queue = new LinkedList<>();
-		List<String> discovered = new ArrayList<>();
+	public Graph<String> crawl() {
+		AdjacencyListGraph<String> webGraph = new AdjacencyListGraph<>(); // Initialize empty webGraph
+		List<List<TaggedVertex<String>>> layers = new ArrayList<>();
+		layers.add(new LinkedList<>()); // Initialize empty list L[0]
+		int layerCounter = 0; // Initialize layer counter to 0
+		Map<String, Integer> discoveredUrlsWithIndices = new HashMap<>(); // Initialize empty hash table to store (url, index)
 
-		graph.addVertex(seedUrl);
-		queue.add(new TaggedVertex<>(seedUrl, 0));
-		discovered.add(seedUrl);
+		webGraph.addVertex(seedUrl); // Add seedUrl to webGraph
+		layers.get(layerCounter).add(new TaggedVertex<>(seedUrl, 0)); // Add (seedUrl, 0) to L[0]
+		discoveredUrlsWithIndices.put(seedUrl, 0); // Add (seedUrl, 0) to discoveredUrlsWithIndices
 
-		TaggedVertex<String> currentPage;
-		List<String> links;
-		int linkIndex, depth = 0;
-		while (!queue.isEmpty() && depth <= maxDepth) {
-			currentPage = queue.remove();
-			links = webService.getLinksFromPage(currentPage.getVertexData());
-			for (String link : links) {
-				if (Util.ignoreLink(currentPage.getVertexData(), link)) {
-					continue;
-				}
-				if (!discovered.contains(link)) {
-					discovered.add(link);
-					linkIndex = graph.addVertexReturnIndex(link);
-					graph.addEdge(currentPage.getTagValue(), linkIndex);
-					queue.add(new TaggedVertex<>(link, linkIndex));
-				} else {
-					linkIndex = graph.indexOf(link);
-					if (!graph.getNeighbors(currentPage.getTagValue()).contains(linkIndex)) { // TODO: Refactor
-						graph.addEdge(currentPage.getTagValue(), linkIndex);
+		while (!layers.get(layerCounter).isEmpty() && layerCounter <= maxDepth) { // While L[i] isn't empty and i<=maxDepth
+			layers.add(new LinkedList<>()); // Initialize empty list L[i+1]
+			for (TaggedVertex<String> currentPage : layers.get(layerCounter)) { // For each page in L[i]
+				List<String> linksFromCurrentPage = webService.getLinksFromPage(currentPage.getVertexData());
+				for (String link : linksFromCurrentPage) { // For each link in current page
+					if (Util.ignoreLink(currentPage.getVertexData(), link)) { // Ignore link if necessary
+						continue;
+					}
+					int linkIndex = discoveredUrlsWithIndices.getOrDefault(link, -1);
+					if (linkIndex == -1) { // If link hasn't been discovered
+						linkIndex = webGraph.addVertexReturnIndex(link); // Add to webGraph
+						webGraph.addEdge(currentPage.getTagValue(), linkIndex); // Add edge to webGraph
+						discoveredUrlsWithIndices.put(link, linkIndex); // Add to set of discovered vertices
+						layers.get(layerCounter + 1).add(new TaggedVertex<>(link, linkIndex)); // Add to L[i+1]
+					} else { // If link has been discovered
+						if (!webGraph.getNeighbors(currentPage.getTagValue()).contains(linkIndex)) {
+							webGraph.addEdge(currentPage.getTagValue(), linkIndex); // Add edge if not already added
+						}
+					}
+					if (webGraph.size() == maxPages) { // Return if page limit has been reached
+						return webGraph;
 					}
 				}
-				if (graph.vertexData().size() == maxPages) {
-					return graph;
-				}
 			}
-			depth++; // TODO: I don't think this is right.
+			layerCounter++; // Increment layer counter
 		}
-		return graph;
+		return webGraph;
 	}
 }
