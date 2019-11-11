@@ -11,8 +11,8 @@ class IndexTest {
 
 	final String TEST_DATA_FILE = "src/test/test_data/VertexDataWithIncomingCounts.properties";
 
-	String testQuery1 = "immense",
-			testQuery2 = "ego";
+	String testQuery1 = "Propane",
+			testQuery2 = "Charcoal";
 
 	Index index;
 
