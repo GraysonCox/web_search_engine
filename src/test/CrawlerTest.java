@@ -12,7 +12,7 @@ class CrawlerTest {
 
 	final String PROPERTIES_FILE = "src/test/test_data/VertexDataWithIncomingCounts.properties";
 
-	final String testUrl = "https://www.spacejam.com/archive/spacejam/movie/jam.html";
+	final String testUrl = "http://web.cs.iastate.edu/~smkautz/cs311f19/temp/a.html";
 	final int maxDepth = 15;
 	final int maxPages = 150;
 

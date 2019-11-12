@@ -1,9 +1,9 @@
 package pa1;
 
-import java.util.*;
-
 import api.TaggedVertex;
 import api.Util;
+
+import java.util.*;
 
 /**
  * Implementation of an inverted index for a web graph.
@@ -31,14 +31,6 @@ public class Index {
 		for (TaggedVertex<String> v : urls) {
 			inDegreesForUrl.put(v.getVertexData(), v.getTagValue());
 		}
-	}
-
-	/**
-	 * This prevents my unit tests from re-building the index unnecessarily.
-	 * @return true if the Index's data structures have already been made.
-	 */
-	public boolean isMade() {
-		return !listW.isEmpty();
 	}
 
 	/**
@@ -81,22 +73,20 @@ public class Index {
 	public List<TaggedVertex<String>> search(String w) {
 		w = Util.stripPunctuation(w);
 		Map<String, Integer> pagesContainingW = listW.get(w);
-		if (pagesContainingW == null) {
+		if (pagesContainingW == null || pagesContainingW.isEmpty()) {
 			return new ArrayList<>();
 		}
-		SortedSet<TaggedVertex<String>> rankedList = new TreeSet<>(rankComparator);
+		List<TaggedVertex<String>> rankedList = new ArrayList<>();
 		int rank;
 		for (Map.Entry<String, Integer> urlTuple : pagesContainingW.entrySet()) {
-			if (urlTuple.getValue() == 0) { // TODO: Is this necessary?
-				continue;
-			}
 			rank = inDegreesForUrl.get(urlTuple.getKey()) * urlTuple.getValue();
 			if (rank == 0) {
 				continue;
 			}
 			rankedList.add(new TaggedVertex<>(urlTuple.getKey(), rank));
 		}
-		return new ArrayList<>(rankedList); // TODO: Make sure this is efficient.
+		rankedList.sort(rankComparator);
+		return rankedList;
 	}
 
 
@@ -122,7 +112,7 @@ public class Index {
 		if (pagesContainingW1 == null || pagesContainingW2 == null) {
 			return new ArrayList<>();
 		}
-		SortedSet<TaggedVertex<String>> rankedList = new TreeSet<>(rankComparator);
+		List<TaggedVertex<String>> rankedList = new ArrayList<>();
 		int rank, w2Count;
 		for (Map.Entry<String, Integer> urlTuple : pagesContainingW1.entrySet()) {
 			w2Count = pagesContainingW2.getOrDefault(urlTuple.getKey(), 0);
@@ -135,7 +125,8 @@ public class Index {
 			}
 			rankedList.add(new TaggedVertex<>(urlTuple.getKey(), rank));
 		}
-		return new ArrayList<>(rankedList);
+		rankedList.sort(rankComparator);
+		return rankedList;
 	}
 
 	/**
@@ -158,20 +149,18 @@ public class Index {
 		Map<String, Integer> pagesContainingW1 = listW.get(w1),
 				pagesContainingW2 = listW.get(w2);
 		int w1Count, w2Count, rank;
-		SortedSet<TaggedVertex<String>> rankedList = new TreeSet<>(rankComparator);
+		List<TaggedVertex<String>> rankedList = new ArrayList<>();
 		for (Map.Entry<String, Integer> urlInDegreeTuple : inDegreesForUrl.entrySet()) {
 			w1Count = pagesContainingW1.getOrDefault(urlInDegreeTuple.getKey(), 0);
 			w2Count = pagesContainingW2.getOrDefault(urlInDegreeTuple.getKey(), 0);
-			if (w1Count == 0 && w2Count == 0) {
-				continue;
-			}
 			rank = urlInDegreeTuple.getValue() * (w1Count + w2Count);
 			if (rank == 0) {
 				continue;
 			}
 			rankedList.add(new TaggedVertex<>(urlInDegreeTuple.getKey(), rank));
 		}
-		return new ArrayList<>(rankedList); // TODO: Make sure this is efficient.
+		rankedList.sort(rankComparator);
+		return rankedList;
 	}
 
 	/**
@@ -192,11 +181,11 @@ public class Index {
 		w1 = Util.stripPunctuation(w1);
 		w2 = Util.stripPunctuation(w2);
 		Map<String, Integer> pagesContainingW1 = listW.get(w1),
-			pagesContainingW2 = listW.get(w2);
+				pagesContainingW2 = listW.get(w2);
 		if (pagesContainingW1 == null) {
 			return new ArrayList<>();
 		}
-		SortedSet<TaggedVertex<String>> rankedList = new TreeSet<>(rankComparator);
+		List<TaggedVertex<String>> rankedList = new ArrayList<>();
 		int rank;
 		for (Map.Entry<String, Integer> urlTuple : pagesContainingW1.entrySet()) {
 			if (pagesContainingW2.containsKey(urlTuple.getKey())) {
@@ -208,6 +197,7 @@ public class Index {
 			}
 			rankedList.add(new TaggedVertex<>(urlTuple.getKey(), rank));
 		}
-		return new ArrayList<>(rankedList); // TODO: Make sure this is efficient.
+		rankedList.sort(rankComparator);
+		return rankedList;
 	}
 }
