@@ -8,20 +8,23 @@ import java.util.*;
 /**
  * An implementation of Graph
  *
- * @param <E> The data associated with each vertex
  * @author Grayson Cox
  */
-public class AdjacencyListGraph<E> implements Graph<E> {
+public class WebGraph implements Graph<String> {
 
-	private ArrayList<E> vertices;
+	private ArrayList<String> vertices;
 	private ArrayList<LinkedList<Integer>> adjacencyLists;
 
 	/**
-	 * Constructs an empty AdjacencyListGraph
+	 * Constructs a WebGraph containing a single vertex for the given URL
+	 *
+	 * @param seedUrl The root URL of the graph
 	 */
-	public AdjacencyListGraph() {
+	public WebGraph(String seedUrl) {
 		vertices = new ArrayList<>();
+		vertices.add(seedUrl);
 		adjacencyLists = new ArrayList<>();
+		adjacencyLists.add(new LinkedList<>());
 	}
 
 	/**
@@ -29,7 +32,7 @@ public class AdjacencyListGraph<E> implements Graph<E> {
 	 *
 	 * @param v The data for the new vertex to be added
 	 */
-	public void addVertex(E v) {
+	public void addVertex(String v) {
 		vertices.add(v);
 		adjacencyLists.add(new LinkedList<>());
 	}
@@ -40,7 +43,7 @@ public class AdjacencyListGraph<E> implements Graph<E> {
 	 * @param v The data for the new vertex to be added
 	 * @return The index of the new vertex
 	 */
-	public int addVertexReturnIndex(E v) {
+	public int addVertexReturnIndex(String v) {
 		vertices.add(v);
 		adjacencyLists.add(new LinkedList<>());
 		return vertices.size() - 1;
@@ -67,14 +70,15 @@ public class AdjacencyListGraph<E> implements Graph<E> {
 	}
 
 	@Override
-	public ArrayList<E> vertexData() {
+	public ArrayList<String> vertexData() {
 		return vertices;
 	}
 
 	@Override
-	public ArrayList<TaggedVertex<E>> vertexDataWithIncomingCounts() {
-		ArrayList<TaggedVertex<E>> taggedVertices = new ArrayList<>();
+	public ArrayList<TaggedVertex<String>> vertexDataWithIncomingCounts() {
+		ArrayList<TaggedVertex<String>> taggedVertices = new ArrayList<>();
 		int[] incomingCounts = new int[adjacencyLists.size()];
+		incomingCounts[0]++; // Add 1 to the indegree of the seedUrl as per the project specification.
 		for (List<Integer> adjList : adjacencyLists) {
 			for (int i : adjList) {
 				incomingCounts[i]++;

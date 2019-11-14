@@ -42,13 +42,12 @@ public class Crawler {
 	 * @return an instance of Graph representing this portion of the web
 	 */
 	public Graph<String> crawl() {
-		AdjacencyListGraph<String> webGraph = new AdjacencyListGraph<>(); // Initialize empty webGraph
+		WebGraph webGraph = new WebGraph(seedUrl); // Initialize webGraph with seedUrl
 		List<List<TaggedVertex<String>>> layers = new ArrayList<>();
 		layers.add(new LinkedList<>()); // Initialize empty list L[0]
 		int layerCounter = 0; // Initialize layer counter to 0
 		Map<String, Integer> discoveredUrlsWithIndices = new HashMap<>(); // Initialize empty hash table to store (url, index)
 
-		webGraph.addVertex(seedUrl); // Add seedUrl to webGraph
 		layers.get(layerCounter).add(new TaggedVertex<>(seedUrl, 0)); // Add (seedUrl, 0) to L[0]
 		discoveredUrlsWithIndices.put(seedUrl, 0); // Add (seedUrl, 0) to discoveredUrlsWithIndices
 
