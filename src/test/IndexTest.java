@@ -9,9 +9,10 @@ import java.util.List;
 
 class IndexTest {
 
-	final String TEST_DATA_FILE = "src/test/test_data/VertexDataWithIncomingCounts.properties";
+//	final String TEST_DATA_FILE = "src/test/test_data/VertexDataWithIncomingCounts.properties";
+	final String TEST_DATA_FILE = "src/test/test_data/Wikipedia.properties";
 
-	String testQuery1 = "vanilla",
+	String testQuery1 = "cat",
 			testQuery2 = "chicken";
 
 	Index index;
