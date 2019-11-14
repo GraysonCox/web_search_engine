@@ -71,7 +71,6 @@ public class Index {
 	 * @return ranked list of urls
 	 */
 	public List<TaggedVertex<String>> search(String w) {
-		w = Util.stripPunctuation(w);
 		Map<String, Integer> pagesContainingW = listW.get(w);
 		if (pagesContainingW == null || pagesContainingW.isEmpty()) {
 			return new ArrayList<>();
@@ -105,8 +104,6 @@ public class Index {
 	 * @return ranked list of urls
 	 */
 	public List<TaggedVertex<String>> searchWithAnd(String w1, String w2) {
-		w1 = Util.stripPunctuation(w1);
-		w2 = Util.stripPunctuation(w2);
 		Map<String, Integer> pagesContainingW1 = listW.get(w1),
 				pagesContainingW2 = listW.get(w2);
 		if (pagesContainingW1 == null || pagesContainingW2 == null) {
@@ -144,8 +141,6 @@ public class Index {
 	 * @return ranked list of urls
 	 */
 	public List<TaggedVertex<String>> searchWithOr(String w1, String w2) {
-		w1 = Util.stripPunctuation(w1);
-		w2 = Util.stripPunctuation(w2);
 		Map<String, Integer> pagesContainingW1 = listW.get(w1),
 				pagesContainingW2 = listW.get(w2);
 		int w1Count, w2Count, rank;
@@ -178,8 +173,6 @@ public class Index {
 	 * @return ranked list of urls
 	 */
 	public List<TaggedVertex<String>> searchAndNot(String w1, String w2) {
-		w1 = Util.stripPunctuation(w1);
-		w2 = Util.stripPunctuation(w2);
 		Map<String, Integer> pagesContainingW1 = listW.get(w1),
 				pagesContainingW2 = listW.get(w2);
 		if (pagesContainingW1 == null) {
