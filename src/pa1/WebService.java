@@ -1,9 +1,12 @@
 package pa1;
 
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +30,11 @@ public class WebService {
 		requestCount = 0;
 	}
 
+	/**
+	 * Gets the singleton instance of WebService
+	 *
+	 * @return A reference to the WebService singleton
+	 */
 	public static WebService getInstance() {
 		if (instance == null) {
 			instance = new WebService();
@@ -80,10 +88,16 @@ public class WebService {
 			Document doc = Jsoup.connect(url).get();
 			coolDownIfNeeded();
 			return doc;
+		} catch (UnsupportedMimeTypeException e) {
+			System.err.println("Unsupported MIME type: " + e.getMimeType());
+		} catch (HttpStatusException e) {
+			System.err.println(e.getStatusCode() + ": " + e.getLocalizedMessage());
+		} catch (IOException e) {
+			System.err.println("IO Exception: " + e.getLocalizedMessage());
 		} catch (Exception e) {
-			System.err.println("Couldn't connect to " + url);
-			return null;
+			System.err.println("Error: " + e.getLocalizedMessage());
 		}
+		return null;
 	}
 
 	/**
