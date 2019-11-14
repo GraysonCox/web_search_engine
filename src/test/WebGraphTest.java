@@ -3,7 +3,7 @@ package test;
 import api.TaggedVertex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pa1.AdjacencyListGraph;
+import pa1.WebGraph;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AdjacencyListGraphTest {
+class WebGraphTest {
 
 	final String testVertices[] = {
 			"A",
@@ -30,7 +30,7 @@ class AdjacencyListGraphTest {
 
 	final int testVertex = 3;
 
-	AdjacencyListGraph<String> graph = new AdjacencyListGraph();
+	WebGraph graph = new WebGraph("R");
 
 	@BeforeEach
 	void setUp() {
